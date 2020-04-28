@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1 # Changed from apps/v1
+kind: Rollout # Changed from Deployment
+# ----- Everything below this comment is the same as a deployment -----
+metadata:
+  name: example-rollout
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.15.4
+        ports:
+        - containerPort: 80
+  minReadySeconds: 30
+  revisionHistoryLimit: 3
+  strategy:
+  # ----- Everything above this comment are the same as a deployment -----
+    canary: # A new field that used to provide configurable options for a Canary strategy
+      steps:
+      - setWeight: 25
+      - pause:
+          duration: 10s
+      - setWeight: 50
+      - pause:
+          duration: 10s
+      - setWeight: 75
+      - pause: {}
